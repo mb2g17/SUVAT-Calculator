@@ -1,0 +1,360 @@
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<style>
+	body {
+		background-image: url("back.jpg");
+		background-repeat: repeat;
+	}
+	#mainDiv {
+		text-align: center;
+		font-family: "Georgia";
+	}
+	#suvatDiv {
+		background-color: white;
+		display: inline-block;
+		text-align: left;
+		box-shadow: 0px 0px 25px black;
+		padding-top: 20px;
+		padding-right: 50px;
+		padding-left: 50px;
+		padding-bottom: 10px;
+	}
+	#title {
+		text-shadow: 0px 0px 10px grey;
+	}
+</style>
+
+<script>
+	$("document").ready(function()
+	{
+		$("#resetBtn").click(function(){
+			
+			// Resets everything
+			setColour("s", "black");
+			setColour("u", "black");
+			setColour("v", "black");
+			setColour("a", "black");
+			setColour("t", "black");
+			setFormulas("", "");
+			putInBox("s", "");
+			putInBox("u", "");
+			putInBox("v", "");
+			putInBox("a", "");
+			putInBox("t", "");
+			
+		});
+		
+		$("#resetRedsBtn").click(function(){
+			
+			if ($("#s").css("color") == "rgb(255, 0, 0)")
+			{
+				setColour("s", "black");
+				putInBox("s", "");
+			}
+			if ($("#u").css("color") == "rgb(255, 0, 0)")
+			{
+				setColour("u", "black");
+				putInBox("u", "");
+			}
+			if ($("#v").css("color") == "rgb(255, 0, 0)")
+			{
+				setColour("v", "black");
+				putInBox("v", "");
+			}
+			if ($("#a").css("color") == "rgb(255, 0, 0)")
+			{
+				setColour("a", "black");
+				putInBox("a", "");
+			}
+			if ($("#t").css("color") == "rgb(255, 0, 0)")
+			{
+				setColour("t", "black");
+				putInBox("t", "");
+			}
+			
+		});
+		
+		$("#calculateBtn").click(function()
+		{
+			// Resets reds
+			$("#resetRedsBtn").click();
+			
+			// Sets the colours of the inputs to normal
+			setColour("s", "black");
+			setColour("u", "black");
+			setColour("v", "black");
+			setColour("a", "black");
+			setColour("t", "black");
+			
+			// Checks all text boxes for values and gets function name AND gets values
+			var functionName = "";
+			var s = 0, u = 0, v = 0, a = 0, t = 0;
+			
+			if (document.getElementById("s").value != "")
+			{
+				functionName += "s";
+				s = parseFloat(document.getElementById("s").value);
+			}
+			if (document.getElementById("u").value != "")
+			{
+				functionName += "u";
+				u = parseFloat(document.getElementById("u").value);
+			}
+			if (document.getElementById("v").value != "")
+			{
+				functionName += "v";
+				v = parseFloat(document.getElementById("v").value);
+			}
+			if (document.getElementById("a").value != "")
+			{
+				functionName += "a";
+				a = parseFloat(document.getElementById("a").value);
+			}
+			if (document.getElementById("t").value != "")
+			{
+				functionName += "t";
+				t = parseFloat(document.getElementById("t").value);
+			}
+			
+			// Checks if there are numbers ONLY
+			/*var total = document.getElementById("s").value +
+						document.getElementById("u").value +
+						document.getElementById("v").value +
+						document.getElementById("a").value +
+						document.getElementById("t").value;
+			var isnum = /^[0-9.]+$/.test(total);
+			
+			if (!isnum)
+			{
+				alert("Numbers only, please!");
+				return;
+			}*/
+			
+			if (isNaN(s) || isNaN(u) || isNaN(v) || isNaN(a) || isNaN(t))
+			{
+				alert("Numbers only, please!");
+				return;
+			}
+			
+			// Executes the calculations
+			if (functionName.includes("vat"))
+				vat(v, a, t);
+			else if (functionName.includes("uat"))
+				uat(u, a, t);
+			else if (functionName.includes("uvt"))
+				uvt(u, v, t);
+			else if (functionName.includes("uva"))
+				uva(u, v, a);
+				
+			else if (functionName.includes("sat"))
+				sat(s, a, t);
+			else if (functionName.includes("svt"))
+				svt(s, v, t);
+			else if (functionName.includes("sva"))
+				sva(s, v, a);
+				
+			else if (functionName.includes("sut"))
+				sut(s, u, t);
+			else if (functionName.includes("sua"))
+				sua(s, u, a);
+				
+			else if (functionName.includes("suv"))
+				suv(s, u, v);
+			
+		});
+	});
+	
+	// ---------------------------
+	// -- SUVAT FUNCTIONS START --
+	// ---------------------------
+	
+	function vat(v, a, t)
+	{
+		setFormulas("u = v - at", "s = vt - " + fraction("1", "2") + "at<sup>2</sup>");
+		setColour("u", "red");
+		setColour("s", "red");
+		putInBox("u", v - a * t);
+		putInBox("s", (v * t) - 0.5 * a * Math.pow(t, 2));
+	}
+	
+	function uat(u, a, t)
+	{
+		setFormulas("v = u + at", "s = ut + " + fraction("1", "2") + "at<sup>2</sup>");
+		setColour("v", "red");
+		setColour("s", "red");
+		putInBox("v", u + a * t);
+		putInBox("s", (u * t) + 0.5 * a * Math.pow(t, 2));
+	}
+	
+	function uvt(u, v, t)
+	{
+		setFormulas(
+		"a = " + fraction("1", "t") + "(v - u)",
+		"s = " + fraction("1", "2") + "(u + v)t");
+		setColour("a", "red");
+		setColour("s", "red");
+		putInBox("a", (v - u) / t);
+		putInBox("s", 0.5 * (u + v) * t);
+	}
+	
+	function uva(u, v, a)
+	{
+		setFormulas(
+		"t = " + fraction("1", "a") + "(v - u)",
+		"s = " + fraction("1", "2a") + "(v<sup>2</sup> - u<sup>2</sup>)");
+		setColour("t", "red");
+		setColour("s", "red");
+		putInBox("t", (v - u) / a);
+		putInBox("s", (Math.pow(v, 2) - Math.pow(u, 2)) / (2 * a));
+	}
+	
+	function sat(s, a, t)
+	{
+		setFormulas(
+		"u = " + fraction("1", "t") + "(s - " + fraction("1", "2") + "at<sup>2</sup>)",
+		"v = " + fraction("1", "t") + "(s + " + fraction("1", "2") + "at<sup>2</sup>)");
+		setColour("u", "red");
+		setColour("v", "red");
+		putInBox("u", (1 / t) * (s - 0.5 * a * Math.pow(t, 2)) );
+		putInBox("v", (1 / t) * (s + 0.5 * a * Math.pow(t, 2)) );
+	}
+	
+	function svt(s, v, t)
+	{
+		setFormulas(
+		"u = " + fraction("2s", "t") + " - v",
+		"a = " + fraction("1", "-0.5t<sup>2</sup>") + "(s - vt)");
+		setColour("u", "red");
+		setColour("a", "red");
+		putInBox("u", (2 * s) / t - v);
+		putInBox("a", (s - v * t) / (-0.5 * Math.pow(t, 2)));
+	}
+	
+	function sva(s, v, a)
+	{
+		setFormulas(
+		"u = " + squareRoot("v<sup>2</sup> - 2as"),
+		"t = " + fraction("1", "a") + "(-v ± " + squareRoot("v<sup>2</sup> - 2as") + ")");
+		setColour("u", "red");
+		setColour("t", "red");
+		putInBox("u", Math.sqrt( Math.pow(v, 2) - 2 * a * s ) );
+		putInBox("t", (1 / a) * (-v + Math.sqrt( Math.pow(v, 2) - 2 * a * s ) ) + ", " + (1 / a) * (-v - Math.sqrt( Math.pow(v, 2) - 2 * a * s )));
+	}
+	
+	function sut(s, u, t)
+	{
+		setFormulas(
+		"v = " + fraction("2s", "t") + " - u",
+		"a = " + fraction("1", "0.5t<sup>2</sup>") + "(s - ut)");
+		setColour("v", "red");
+		setColour("a", "red");
+		putInBox("v",  2 * s / t - u);
+		putInBox("a",  (1 / (0.5 * Math.pow(t, 2))) * (s - u * t));
+	}
+	
+	function sua(s, u, a)
+	{
+		setFormulas(
+		"v = " + squareRoot("u<sup>2</sup> + 2as"),
+		"t = " + fraction("1", "a") + "(-u ± " + squareRoot("u<sup>2</sup> + 2as") + ")");
+		setColour("v", "red");
+		setColour("t", "red");
+		putInBox("v", Math.sqrt( Math.pow(u, 2) + 2 * a * s ) );
+		putInBox("t", (1 / a) * (-u + Math.sqrt( Math.pow(u, 2) + 2 * a * s ) ) + ", " + (1 / a) * (-u - Math.sqrt( Math.pow(u, 2) + 2 * a * s )));
+	}
+	
+	function suv(s, u, v)
+	{
+		setFormulas(
+		"a = " + fraction("1", "2s") + "(v<sup>2</sup> - u<sup>2</sup>)",
+		"t = " + fraction("2s", "(u + v)"));
+		setColour("a", "red");
+		setColour("t", "red");
+		putInBox("a", (1 / (2 * s)) * (Math.pow(v, 2) - Math.pow(u, 2)));
+		putInBox("t", (2 * s) / (u + v));
+	}
+	
+	// -------------------------
+	// -- SUVAT FUNCTIONS END --
+	// -------------------------
+	
+	// A function that puts something in a square root HTML style
+	function squareRoot(str)
+	{
+		return "&radic;<span style='text-decoration: overline'>" + str + "</span>";
+	}
+	
+	// A function that sets the colour of a DOM obj given an ID
+	function setColour(id, colour)
+	{
+		document.getElementById(id).style.color = colour;
+	}
+	
+	// A function that sets the formulas up
+	function setFormulas(str1, str2)
+	{
+		document.getElementById("formula1").innerHTML = str1;
+		document.getElementById("formula2").innerHTML = str2;
+	}
+	
+	// A function that writes two numbers into a nice-looking HTML fraction
+	function fraction(str1, str2)
+	{
+		return "<sup>" + str1 + "</sup>&frasl;<sub>" + str2 + "</sub>";
+	}
+	
+	// A function that puts a string into the value on an input box-shadow
+	function putInBox(id, value)
+	{
+		document.getElementById(id).value = value;
+	}
+	
+</script>
+
+<html>
+
+	<head>
+		<title>SUVAT Calculator</title>
+	</head>
+	
+	<body>
+		
+		<div id="mainDiv">
+		
+			<br/>
+			<h1 id="title">SUVAT Calculator</h1>
+			<br/>
+			
+			<div id="suvatDiv">
+				s: <input id="s" type="text" > m<br/><br/>
+				u: <input id="u" type="text" > ms<sup>-1</sup><br/><br/>
+				v: <input id="v" type="text" > ms<sup>-1</sup><br/><br/>
+				a: <input id="a" type="text" > ms<sup>-2</sup><br/><br/>
+				t: <input id="t" type="text" > s<br/><br/>
+			</div>
+			
+			<br/>
+			<br/>
+			<br/>
+			<button id="calculateBtn">Calculate</button>
+			<br/>
+			<br/>
+			<button id="resetBtn">Reset All</button>
+			<button id="resetRedsBtn">Reset Reds</button>
+			<br/>
+			<br/>
+			
+			<h3>Formulae used:</h3>
+			<p id="formula1"></p>
+			<p id="formula2"></p>
+			
+			<br/>
+			<br/>
+			<p style="position:absolute;bottom:0px;">Written by <a href="http://www.matthewbarnes.x10.mx/index.html">Matthew Barnes</a></p>
+		
+		</div>
+		
+	</body>
+	
+</html>
